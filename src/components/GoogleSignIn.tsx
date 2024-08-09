@@ -1,14 +1,18 @@
 import { Button } from "./ui/button";
-import { FC, ReactNode } from "react";
-
+import { FC, ReactNode, useState } from "react";
+import { signIn } from "next-auth/react";
+import { boolean } from "zod";
 interface GoogleSignInButtonProps {
     children :ReactNode 
 }
 
 const GoogleSignInButton : FC<GoogleSignInButtonProps> = ({children}) => {
-    const loginWithGoogle = () => {
-        console.log('login with Google')
-    }
+    
+    const[loading,setLoading]= useState<boolean>(false)
+
+    const loginWithGoogle = () => signIn('google',{callbackUrl:'http://localhost:3000/admin'})
+      
+    
     return (
         <>
         <Button onClick={loginWithGoogle}  className="w-full" >
