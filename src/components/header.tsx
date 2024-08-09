@@ -1,8 +1,13 @@
 import Link from "next/link"
-import { buttonVariants } from "./ui/button"
+import { Button, buttonVariants } from "./ui/button"
 import {HandMetal} from 'lucide-react'
+import { authOptions } from "@/lib/auth"
+import { getServerSession } from "next-auth"
+import { signOut } from "next-auth/react"
+import UserAccountNav from "./UserAccountNav"
 
-const Header = () => {
+const Header = async() => {
+    const session = await getServerSession(authOptions)
     return (
         <>
         <header className="bg-blue-500 p-4">
@@ -15,11 +20,18 @@ const Header = () => {
                     <HandMetal/>
                     </Link>
                 </li>
-                <li>
+                {/* <li>
                     <Link className={buttonVariants()} href='/sign-in'>
                     signin
                     </Link>
-                </li>
+                </li> */}
+                {session?.user ? (
+                    <UserAccountNav/>
+                ) : (
+                     <Link className={buttonVariants()} href='sign-in' >
+                     SignIn
+                     </Link>
+                ) }
             </ul>
             </nav>
         </header>

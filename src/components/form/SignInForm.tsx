@@ -1,33 +1,53 @@
 "use client"
 import React from 'react'
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '../ui/form'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form'
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'  // Import the resolver
+import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import Link from 'next/link'
 import GoogleSignInButton from '../GoogleSignIn'
+import { signIn } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
+import { useToast } from "@/components/ui/use-toast"
 
 // Define the form validation schema using zod
 const FormSchema = z.object({
-   email:z.string().min(1,'Email is required').email("Invalid Email")  ,
-   password:z.string().min(6,'Password must have minimum 6 words')
+  email: z.string().min(1, 'Email is required').email("Invalid Email"),
+  password: z.string().min(6, 'Password must have minimum 6 characters')
 })
 
 const SignInForm = () => {
+  const router = useRouter()
+  const { toast } = useToast()  // Destructure `toast` from the returned object
+
   // Use useForm hook with zodResolver for validation
   const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),  // Apply the resolver
+    resolver: zodResolver(FormSchema),
     defaultValues: {
       email: "",
-      password:""
+      password: ""
     },
   })
 
   // Form submission handler
-  const onSubmit = (data: z.infer<typeof FormSchema>) => {
-    console.log('Form submitted:', data)
+  const onSubmit = async (data: z.infer<typeof FormSchema>) => {
+    const signInData = await signIn('credentials', {
+      email: data.email,
+      password: data.password,
+      redirect: false
+    })
+    if (signInData?.error) {
+      toast({
+        title: "Error",
+        description: "Something went wrong!",
+        variant:'destructive'
+      })
+    } else {
+      router.refresh()
+      router.push('/admin')
+    }
   }
 
   return (
