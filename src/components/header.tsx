@@ -5,8 +5,11 @@ import { authOptions } from "@/lib/auth"
 import { getServerSession } from "next-auth"
 import { signOut } from "next-auth/react"
 import UserAccountNav from "./UserAccountNav"
+import { getCurrentUser } from "@/lib/session"
+import ButtonLogout from "./button-logout"
 
 const Header = async() => {
+    const user = await getCurrentUser()
     const session = await getServerSession(authOptions)
     return (
         <>
@@ -25,13 +28,27 @@ const Header = async() => {
                     signin
                     </Link>
                 </li> */}
-                {session?.user ? (
+                {/* {session?.user ? (
                     <UserAccountNav/>
                 ) : (
                      <Link className={buttonVariants()} href='sign-in' >
                      SignIn
                      </Link>
-                ) }
+                ) } */}
+                {
+                    user?.username ? (
+                        <ButtonLogout/>
+                    ): (
+                        <li>
+                            <Link
+                            href='/api/auth/signin'
+                            className="text-white hover:underline"
+                            >
+                            Login
+                            </Link>
+                        </li>
+                    )
+                }
             </ul>
             </nav>
         </header>

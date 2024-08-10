@@ -2,10 +2,15 @@
 import { FormData } from '@/types/blog';
 import React, { ChangeEvent, FormEvent, useState } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
+import axios from 'axios';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 const inputClass = 'w-full py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:border-blue-300';
 
 const Form = () => {
+    const router = useRouter();
+    const { data: session } = useSession();
     const [formData, setFormData] = useState<FormData>({
         title: '',
         content: ''
@@ -20,9 +25,16 @@ const Form = () => {
         });
     }
 
-    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log(formData);
+        try {
+            const response = await axios.post('/api/posts', formData);
+            if (response.status === 200) {
+                router.push(`/blogs/${response.data.newPost.id}`);
+            }
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     return (
@@ -51,6 +63,7 @@ const Form = () => {
                         />
                     </div>
                     <button
+                        disabled={!session?.user?.email} // Updated to use session
                         type="submit"
                         className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md w-full focus:outline-none focus:ring focus:border-blue-300"
                     >

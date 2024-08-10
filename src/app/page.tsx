@@ -9,12 +9,12 @@ export default async function Home() {
   return (
      <main>
      <Link className={buttonVariants()} href='/admin' >  Welcome to Admin Page </Link>
-
+{/* 
        <h2>Client Session</h2>
        <User/>
        <h2> Server Session</h2>
-         {JSON.stringify(session)}
-   
+         {JSON.stringify(session)} */}
+      <Form/>
      </main>
   );
 }

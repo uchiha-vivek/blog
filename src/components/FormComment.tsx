@@ -1,13 +1,32 @@
 "use client"
+import axios from 'axios'
+import { useRouter } from 'next/navigation'
 import React, { ChangeEvent, useState } from 'react'
+import { FC } from 'react'
+interface FormCommentProps {
+  postId:string
+}
 
-const FormComment = () => {
+const FormComment : FC<FormCommentProps>  = ({postId}) => {
   const[comment,setComment] = useState<string>('')
+  const router = useRouter()
   const handleCommentChange = (e:ChangeEvent<HTMLInputElement>) => {
       setComment(e.target.value)
   }
-  const handleSubmitComment = () => {
-    console.log(comment)
+  const handleSubmitComment = async() => {
+      if(comment.trim() !== ""){
+        try{
+         const newComment = await axios.post('/api/comments',{
+          postId,
+          text:comment
+         })
+         if(newComment.status===200){
+          router.refresh()
+         }
+        }catch(error){
+          console.log(error)
+        }
+      }
   }
   return (
     <div>
